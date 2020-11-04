@@ -1,11 +1,12 @@
 import React from 'react';
 
-import {View, FlatList} from 'react-native';
+import {View, FlatList, Vibration} from 'react-native';
 import logo from '../../assets/logo.png';
 import {FontAwesome5} from '@expo/vector-icons';
 
 import {Container, Title, NomePet, Image, Voltar, ContainerLista} from './styles';
 import { useNavigation } from '@react-navigation/native';
+import Button from '../../components/Button';
 
 
 const PassearPet: React.FC = () => {
@@ -54,7 +55,7 @@ const PassearPet: React.FC = () => {
                 )}
             />
 
-            
+            <Button onPress={() => Vibration.vibrate([1 * 1000, 2 * 1000, 3 * 1000])}>Vibrar</Button>
 
         </Container>
     )
