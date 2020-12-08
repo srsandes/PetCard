@@ -46,7 +46,7 @@ const PassearPet: React.FC = () => {
 
             <FlatList
                 data={ListPet}
-                keyExtractor={pet => pet.hour}
+                keyExtractor={pet => pet.id.toString() }
                 renderItem={({item: pet}) => (
                 <ContainerLista>
                 <NomePet>Alimentar Pet às: {pet.hour}</NomePet>

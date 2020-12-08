@@ -5,11 +5,25 @@ import logo from '../../assets/logo.png';
 import {FontAwesome5} from '@expo/vector-icons';
 
 import {Container, Title, NomePet, Image, Voltar, TextoInfo} from './styles';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
+interface RouteParams {
+    pet: {
+        nome_do_pet:string; 
+        especie: string; 
+        raca: string; 
+        sexo: string; 
+        cor: string; 
+        dt_nascimento: string; 
+        observacao: string;
+    }
+  }
 
 const DadosPet: React.FC = () => {
     const navigation = useNavigation();
+    const { params } = useRoute();
+
+    const routeParams = params as RouteParams;
 
     function handleVoltar(){
         navigation.goBack();
@@ -28,12 +42,13 @@ const DadosPet: React.FC = () => {
                 <Title>Seus pet's</Title>
             </View>
 
-            <NomePet>Nome: Roberval</NomePet>
-                <TextoInfo>Vacina: Anterábica</TextoInfo>
-                <TextoInfo>Responsável: Maçã delas</TextoInfo>
-                <TextoInfo>Data: 20/10/2020</TextoInfo>
-                <TextoInfo>Peso: 25Kg</TextoInfo>
-                <TextoInfo>Próxima vacina: 30/10/2020</TextoInfo>
+                <NomePet>Nome: {routeParams.pet.nome_do_pet} </NomePet>
+                <TextoInfo>Cor: {routeParams.pet.cor}</TextoInfo>
+                <TextoInfo>Espécie: {routeParams.pet.especie}</TextoInfo>
+                <TextoInfo>Data de nascimento: {routeParams.pet.dt_nascimento}</TextoInfo>
+                <TextoInfo>Raça: {routeParams.pet.raca}</TextoInfo>
+                <TextoInfo>Observação: {routeParams.pet.observacao}</TextoInfo>
+                <TextoInfo>Sexo: {routeParams.pet.sexo}</TextoInfo>
 
             
 

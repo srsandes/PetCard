@@ -1,6 +1,8 @@
 import React from 'react';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import firebase from 'firebase';
+import 'firebase/firestore'; 
 
 import {View, ActivityIndicator, Alert} from 'react-native';
 import logo from '../../assets/logo.png';
@@ -11,27 +13,87 @@ import {FontAwesome5} from '@expo/vector-icons';
 import {Container, Title, ErrorText, Image, ContainerForm, ContentForm, Voltar} from './styles';
 import { useNavigation } from '@react-navigation/native';
 
-interface UserData {
-    email: string;
-    password: string;
+interface PetData {
+    nome_do_pet:string; 
+    especie: string; 
+    raca: string; 
+    sexo: string; 
+    cor: string; 
+    dt_nascimento: string; 
+    observacao: string;
 }
 
 const CadastrarPet: React.FC = () => {
     const navigation = useNavigation();
+    const db = firebase.firestore();
 
-    async function handleLogon(user: UserData){
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if(user.email === 'teste@teste.com' && user.password === '1234'){
-            navigation.navigate('TelaPrincipal')
-        }else{
-            Alert.alert(
-                "Usuário / Senha Incorreto(s)!",
-                "Favor verificar e tentar novamente.",
-                [
-                  { text: "OK" }
-                ]
-                );
-        }
+    async function handleCadastrarPet(pet: PetData){
+        const id = new Date().getTime();
+        const newPet = {
+            nome_do_pet: pet.nome_do_pet,
+            especie: pet.especie, 
+            raca: pet.raca, 
+            sexo: pet.sexo, 
+            cor: pet.cor, 
+            dt_nascimento: pet.dt_nascimento, 
+            observacao: pet.observacao,
+        };
+
+        db.collection('pets').doc(firebase.auth().currentUser?.uid).get().then(resultado => {
+            if(resultado.exists){
+                db.collection('pets').doc(firebase.auth().currentUser?.uid).update({
+                    lista: firebase.firestore.FieldValue.arrayUnion(newPet),
+                }).then(() => {
+                    Alert.alert(
+                        "Seu pet foi cadastrado com sucesso!",
+                        '',
+                        [
+                          { text: "OK" }
+                        ]
+                        );
+                }).catch(() => {
+                    Alert.alert(
+                        "Erro ao cadastrar pet, por favor tente novamente!",
+                        '',
+                        [
+                          { text: "OK" }
+                        ]
+                        );
+                  });
+            }else{
+                db.collection('pets').doc(firebase.auth().currentUser?.uid).set({
+                    lista: [
+                        {
+                            nome_do_pet: pet.nome_do_pet,
+                            especie: pet.especie, 
+                            raca: pet.raca, 
+                            sexo: pet.sexo, 
+                            cor: pet.cor, 
+                            dt_nascimento: pet.dt_nascimento, 
+                            observacao: pet.observacao,
+                        }
+                    ]
+                    
+                  }).then(() => {
+                    Alert.alert(
+                        "Seu pet foi cadastrado com sucesso!",
+                        '',
+                        [
+                          { text: "OK" }
+                        ]
+                        );
+                  }).catch(() => {
+                    Alert.alert(
+                        "Erro ao cadastrar pet, por favor tente novamente!",
+                        '',
+                        [
+                          { text: "OK" }
+                        ]
+                        );
+                  });
+            }
+        })
+
     }
 
     function handleVoltar(){
@@ -53,12 +115,25 @@ const CadastrarPet: React.FC = () => {
 
             <ContainerForm>
             <Formik
-                initialValues={{email:'', password: ''}}
+                initialValues={{
+                    nome_do_pet:'', 
+                    especie: '', 
+                    raca: '', 
+                    sexo: '', 
+                    cor: '', 
+                    dt_nascimento: '', 
+                    observacao: '',
+                }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().required('Email é obrigatório').email('Precisa ser um email'),
-                    password: Yup.string().required('Senha é obrigatória')
+                    nome_do_pet: Yup.string().required('É obrigatorio'), 
+                    especie: Yup.string().required('É obrigatorio'), 
+                    raca: Yup.string().required('É obrigatorio'), 
+                    sexo: Yup.string().required('É obrigatorio'), 
+                    cor: Yup.string().required('É obrigatorio'), 
+                    dt_nascimento: Yup.string().required('É obrigatorio'), 
+                    observacao: Yup.string().required('É obrigatorio'),
                 })}
-                onSubmit={values => handleLogon(values)}
+                onSubmit={values => handleCadastrarPet(values)}
             >
                 {({values, handleChange, handleSubmit, errors, isSubmitting, handleBlur, touched}) => (
                     <ContentForm>
@@ -70,7 +145,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.nome_do_pet} 
                     onChangeText={handleChange('nome_do_pet')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.nome_do_pet && <ErrorText >{errors.nome_do_pet}</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('especie')}
@@ -80,7 +155,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.especie} 
                     onChangeText={handleChange('especie')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.especie && <ErrorText >{errors.especie}</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('raca')}
@@ -90,7 +165,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.raca} 
                     onChangeText={handleChange('raca')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.raca && <ErrorText >{errors.raca }</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('sexo')}
@@ -100,7 +175,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.sexo} 
                     onChangeText={handleChange('sexo')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.sexo && <ErrorText >{errors.sexo}</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('cor')}
@@ -110,7 +185,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.cor} 
                     onChangeText={handleChange('cor')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.cor && <ErrorText >{errors.cor}</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('dt_nascimento')}
@@ -120,7 +195,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.dt_nascimento} 
                     onChangeText={handleChange('dt_nascimento')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
+                    {touched.dt_nascimento && <ErrorText >{errors.dt_nascimento}</ErrorText>}
 
                     <Input 
                     onBlur={handleBlur('observacao')}
@@ -130,10 +205,7 @@ const CadastrarPet: React.FC = () => {
                     value={values.observacao} 
                     onChangeText={handleChange('observacao')}
                     />
-                    {touched.email && <ErrorText >{errors.email}</ErrorText>}
-
-                    
-                    {touched.password && <ErrorText >{errors.password}</ErrorText>}
+                    {touched.observacao && <ErrorText >{errors.observacao}</ErrorText>}
                     
                     {isSubmitting && <ActivityIndicator color='#237A79' />}
                     

@@ -16,27 +16,33 @@ interface UserData {
     password: string;
 }
 
-const Login: React.FC = () => {
+const CadastroUsuario: React.FC = () => {
     const navigation = useNavigation();
 
-    async function handleLogon(user: UserData){
-        firebase.auth().signInWithEmailAndPassword(user.email, user.password)
-	.then(usuarioLogado => {
-        navigation.navigate('TelaPrincipal');
-	}).catch(erro => {
-        Alert.alert(
-            "Algo deu errado ao logar na sua conta!",
-            "Favor verificar e tentar novamente.",
-            [
-              { text: "OK" }
-            ]
-            );
-})
-
+    async function handleCriarUsuario(user: UserData){
+        firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+            .then(usuarioLogado => {
+                Alert.alert(
+                    "Sua conta foi criada com sucesso!",
+                    '',
+                    [
+                      { text: "OK" }
+                    ]
+                    );
+                navigation.navigate('Login');
+            }).catch(erro => {
+                Alert.alert(
+                    "Algo deu errado ao criar sua conta!",
+                    "Favor verificar e tentar novamente.",
+                    [
+                      { text: "OK" }
+                    ]
+                    );
+        })
     }
 
-    function handleCriarConta(){
-        navigation.navigate('CadastroUsuario');
+    function handleVoltarPagina(){
+        navigation.goBack();
     }
     
 
@@ -44,7 +50,7 @@ const Login: React.FC = () => {
         <Container>
             <Image source={logo}/>
             <View>
-                <Title>Faça seu logon</Title>
+                <Title>Crie sua conta</Title>
             </View>
 
             <Formik
@@ -53,7 +59,7 @@ const Login: React.FC = () => {
                     email: Yup.string().required('Email é obrigatório').email('Precisa ser um email'),
                     password: Yup.string().required('Senha é obrigatória')
                 })}
-                onSubmit={values => handleLogon(values)}
+                onSubmit={values => handleCriarUsuario(values)}
             >
                 {({values, handleChange, handleSubmit, errors, isSubmitting, handleBlur, touched}) => (
                     <>
@@ -80,16 +86,16 @@ const Login: React.FC = () => {
                     
                     {isSubmitting && <ActivityIndicator color='#237A79' />}
                     
-                    {!isSubmitting && <Button onPress={() => handleSubmit()}>Entrar</Button>}
+                    {!isSubmitting && <Button onPress={() => handleSubmit()}>Criar conta</Button>}
                     
                     </>
                 )}
             </Formik>
 
-            <Button onPress={handleCriarConta}>Crie sua conta</Button>
+            <Button onPress={handleVoltarPagina}>Voltar</Button>
 
         </Container>
     )
 }
 
-export default Login;
+export default CadastroUsuario;
